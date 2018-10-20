@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.junxi.baiweiserver.mapper.EmployeeTrainMapper">
+
+    <resultMap id="BaseResultMap" type="com.junxi.baiweiserver.model.EmployeeTrain">
+        <result property="id" column="etid"/>
+        <result property="trainDate" column="trainDate"/>
+        <result property="trainContent" column="trainContent"/>
+        <result property="remark" column="remark"/>
+        <association property="employee" javaType="com.junxi.baiweiserver.model.Employee">
+            <result property="id" column="id"/>
+            <result property="name" column="name"/>
+            <result property="gender" column="gender"/>
+            <association property="department" javaType="com.junxi.baiweiserver.model.Department">
+                <result property="name" column="dname"/>
+            </association>
+        </association>
+
+    </resultMap>
+
+    <select id="getAll" resultMap="BaseResultMap">
+        select e.id,e.`name`,e.gender,d.`name` as dname,et.id as etid,et.trainDate,et.trainContent,et.remark
+from employee e,employeetrain et,department d
+where e.id=et.eid and e.departmentId=d.id
+    </select>
+
+    <insert id="addTrain" parameterType="com.junxi.baiweiserver.model.EmployeeTrain">
+        insert into employeetrain set eid=#{eid},trainDate=#{trainDate},trainContent=#{trainContent},remark=#{remark}
+    </insert>
+
+    <delete id="delTrain">
+        delete from employeetrain where id = #{id}
+    </delete>
+
+    <update id="updateTrain" parameterType="com.junxi.baiweiserver.model.EmployeeTrain">
+        update employeetrain set trainDate=#{trainDate},trainContent=#{trainContent},remark=#{remark},eid=#{eid} where id = #{id}
+    </update>
+</mapper>

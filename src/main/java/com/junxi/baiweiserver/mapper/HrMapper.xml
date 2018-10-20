@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.junxi.baiweiserver.mapper.HrMapper">
+    <resultMap id="BaseResultMap" type="com.junxi.baiweiserver.model.Hr" >
+        <id column="id" property="id" jdbcType="INTEGER" />
+        <result column="name" property="name" jdbcType="VARCHAR" />
+        <result column="phone" property="phone" jdbcType="CHAR" />
+        <result column="telephone" property="telephone" jdbcType="VARCHAR" />
+        <result column="address" property="address" jdbcType="VARCHAR" />
+        <result column="enabled" property="enabled" jdbcType="BIT" />
+        <result column="username" property="username" jdbcType="VARCHAR" />
+        <result column="password" property="password" jdbcType="VARCHAR" />
+        <result column="userface" property="userface" jdbcType="VARCHAR" />
+        <result column="remark" property="remark" jdbcType="VARCHAR" />
+        <collection property="roles" ofType="com.junxi.baiweiserver.model.Role">
+            <id column="rid" property="id"/>
+            <result column="rname" property="name"/>
+            <result column="rnameZh" property="nameZh"/>
+        </collection>
+    </resultMap>
+    <select id="loadUserByUsername" resultType="com.junxi.baiweiserver.model.Hr">
+        select * from hr where username = #{username}
+    </select>
+
+    <select id="getAllHrWithRoles" resultMap="BaseResultMap">
+        select hr.*,r.id as rid,r.name as rname,r.nameZh as rnameZh from hr left join hr_role hrr on hr.id=hrr.hrid left join role r on hrr.rid=r.id where r.id!=6
+    </select>
+
+    <update id="updateEnabled" parameterType="com.junxi.baiweiserver.model.Hr">
+        update hr set enabled=#{enabled} where id=#{id}
+    </update>
+
+    <insert id="addRoles">
+      insert into hr_role VALUES
+      <foreach collection="rids" separator="," item="rid">
+          (null,#{hrid},#{rid})
+      </foreach>
+    </insert>
+
+    <delete id="deleteRoles">
+        delete from hr_role where hrid=#{hrid}
+    </delete>
+
+    <delete id="delHr">
+        delete from hr where id=#{hrid}
+    </delete>
+
+    <delete id="delMsg">
+        delete from sysmsg where hrid=#{hrid}
+    </delete>
+</mapper>

@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.junxi.baiweiserver.mapper.EmployeeMapper" >
+  <resultMap id="BaseResultMap" type="com.junxi.baiweiserver.model.Employee" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="gender" property="gender" jdbcType="CHAR" />
+    <result column="birthday" property="birthday" jdbcType="DATE" />
+    <result column="idCard" property="idcard" jdbcType="CHAR" />
+    <result column="wedlock" property="wedlock" jdbcType="CHAR" />
+    <result column="nationId" property="nationid" jdbcType="INTEGER" />
+    <result column="nativePlace" property="nativeplace" jdbcType="VARCHAR" />
+    <result column="politicId" property="politicid" jdbcType="INTEGER" />
+    <result column="email" property="email" jdbcType="VARCHAR" />
+    <result column="phone" property="phone" jdbcType="VARCHAR" />
+    <result column="address" property="address" jdbcType="VARCHAR" />
+    <result column="departmentId" property="departmentid" jdbcType="INTEGER" />
+    <result column="jobLevelId" property="joblevelid" jdbcType="INTEGER" />
+    <result column="posId" property="posid" jdbcType="INTEGER" />
+    <result column="engageForm" property="engageform" jdbcType="VARCHAR" />
+    <result column="tiptopDegree" property="tiptopdegree" jdbcType="CHAR" />
+    <result column="specialty" property="specialty" jdbcType="VARCHAR" />
+    <result column="school" property="school" jdbcType="VARCHAR" />
+    <result column="beginDate" property="begindate" jdbcType="DATE" />
+    <result column="workState" property="workstate" jdbcType="CHAR" />
+    <result column="workID" property="workid" jdbcType="CHAR" />
+    <result column="contractTerm" property="contractterm" jdbcType="DOUBLE" />
+    <result column="conversionTime" property="conversiontime" jdbcType="DATE" />
+    <result column="notWorkDate" property="notworkdate" jdbcType="DATE" />
+    <result column="beginContract" property="begincontract" jdbcType="DATE" />
+    <result column="endContract" property="endcontract" jdbcType="DATE" />
+    <result column="workAge" property="workage" jdbcType="INTEGER" />
+    <association property="department" javaType="com.junxi.baiweiserver.model.Department">
+      <result column="dname" property="name" jdbcType="VARCHAR" />
+    </association>
+    <association property="joblevel" javaType="com.junxi.baiweiserver.model.Joblevel">
+      <result column="jname" property="name" jdbcType="VARCHAR" />
+    </association>
+    <association property="nation" javaType="com.junxi.baiweiserver.model.Nation">
+      <result column="nname" property="name" jdbcType="VARCHAR" />
+    </association>
+    <association property="position" javaType="com.junxi.baiweiserver.model.Position">
+      <result column="pname" property="name" jdbcType="VARCHAR" />
+    </association>
+    <association property="politicsstatus" javaType="com.junxi.baiweiserver.model.Politicsstatus">
+      <result column="psname" property="name" jdbcType="VARCHAR" />
+    </association>
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, name, gender, birthday, idCard, wedlock, nationId, nativePlace, politicId, email, 
+    phone, address, departmentId, jobLevelId, posId, engageForm, tiptopDegree, specialty, 
+    school, beginDate, workState, workID, contractTerm, conversionTime, notWorkDate, 
+    beginContract, endContract, workAge
+  </sql>
+  <select id="getEmployeeByPage" resultMap="BaseResultMap">
+    select emp.*,jl.`name` as jname,n.`name` as nname,d.`name` as dname,ps.`name` as psname,p.`name` as pname from employee emp,joblevel jl,nation n,department d,politicsstatus ps,position p
+where emp.departmentId=d.id and emp.jobLevelId=jl.id and emp.nationId=n.id and emp.politicId=ps.id and emp.posId=p.id
+and emp.`name` like concat('%',#{name},'%') order by emp.id
+  </select>
+
+  <select id="getAll" resultMap="BaseResultMap">
+    select emp.*,jl.`name` as jname,n.`name` as nname,d.`name` as dname,ps.`name` as psname,p.`name` as pname from employee emp,joblevel jl,nation n,department d,politicsstatus ps,position p
+where emp.departmentId=d.id and emp.jobLevelId=jl.id and emp.nationId=n.id and emp.politicId=ps.id and emp.posId=p.id
+  order by emp.id
+  </select>
+
+  <delete id="deleteByEmpId">
+    delete from employee where id in
+    <foreach collection="ids" open="(" close=")" item="id" separator=",">
+      #{id}
+    </foreach>
+  </delete>
+
+  <insert id="allEmployee" parameterType="com.junxi.baiweiserver.model.Employee">
+    insert into employee values
+    <!-- insert into person values(...),(...),(...)通过这种方式实现批量插入 -->
+    <foreach collection="employees" item="emp" separator=",">
+      (null,#{emp.name},#{emp.gender},#{emp.birthday},#{emp.idcard},#{emp.wedlock},
+      #{emp.nationid},#{emp.nativeplace},#{emp.politicid},#{emp.email},#{emp.phone},
+      #{emp.address},#{emp.departmentid},#{emp.joblevelid},#{emp.posid},#{emp.engageform},
+      #{emp.tiptopdegree},#{emp.specialty},#{emp.school},#{emp.begindate},#{emp.workstate},
+      #{emp.workid},#{emp.contractterm},#{emp.conversiontime},#{emp.notworkdate},#{emp.begincontract},
+      #{emp.endcontract},#{emp.workage})
+    </foreach>
+  </insert>
+
+</mapper>

@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.junxi.baiweiserver.mapper.MenuMapper" >
+  <resultMap id="BaseResultMap" type="com.junxi.baiweiserver.model.Menu" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="url" property="url" jdbcType="VARCHAR" />
+    <result column="path" property="path" jdbcType="VARCHAR" />
+    <result column="component" property="component" jdbcType="VARCHAR" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="iconCls" property="iconCls" jdbcType="VARCHAR" />
+    <result column="parentId" property="parentId" jdbcType="INTEGER" />
+    <result column="enabled" property="enabled" jdbcType="BIT" />
+    <association property="meta" javaType="com.junxi.baiweiserver.model.Meta">
+      <result column="keepAlive" property="keepAlive" jdbcType="BIT" />
+      <result column="requireAuth" property="requireAuth" jdbcType="BIT" />
+    </association>
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, url, path, component, name, iconCls, keepAlive, requireAuth, parentId, enabled
+  </sql>
+  
+  <resultMap id="allmenus" type="com.junxi.baiweiserver.model.Menu" extends="BaseResultMap">
+    <collection property="children" ofType="com.junxi.baiweiserver.model.Menu">
+      <id column="id2" property="id" jdbcType="INTEGER" />
+      <result column="url2" property="url" jdbcType="VARCHAR" />
+      <result column="path2" property="path" jdbcType="VARCHAR" />
+      <result column="component2" property="component" jdbcType="VARCHAR" />
+      <result column="name2" property="name" jdbcType="VARCHAR" />
+      <result column="iconCls2" property="iconCls" jdbcType="VARCHAR" />
+      <result column="parentId2" property="parentId" jdbcType="INTEGER" />
+      <result column="enabled2" property="enabled" jdbcType="BIT" />
+      <association property="meta" javaType="com.junxi.baiweiserver.model.Meta">
+        <result column="keepAlive2" property="keepAlive" jdbcType="BIT" />
+        <result column="requireAuth2" property="requireAuth" jdbcType="BIT" />
+      </association>
+      <collection property="children" ofType="com.junxi.baiweiserver.model.Menu">
+        <result column="id3" property="id" />
+        <result column="name3" property="name"/>
+      </collection>
+    </collection>
+  </resultMap>
+
+  <resultMap id="menusandroles" type="com.junxi.baiweiserver.model.Menu" extends="BaseResultMap">
+    <collection property="roles" ofType="com.junxi.baiweiserver.model.Role">
+      <id column="rid" property="id"/>
+      <result column="rname" property="name"/>
+      <result column="rnameZh" property="nameZh"/>
+    </collection>
+  </resultMap>
+
+  <select id="getMenusByHrId" resultMap="allmenus">
+    select DISTINCT m1.*,m2.id as id2,m2.url as url2,m2.path as path2,m2.component as component2,m2.name as name2,
+m2.iconCls as iconCls2,m2.keepAlive as keepAlive2,m2.requireAuth as requireAuth2,m2.parentId as parentId2,m2.enabled as enabled2
+from menu m1,menu m2,menu_role mr,role r,hr_role hrr
+where m1.id=m2.parentId and mr.mid=m2.id and mr.rid=r.id and hrr.rid=r.id and hrr.hrid=#{id}
+  </select>
+
+  <select id="menuAndRoles" resultMap="menusandroles">
+    select m.*,r.id as rid,r.`name` as rname,r.nameZh as rnameZh from menu m
+left join menu_role mr on mr.mid=m.id
+left join role r on r.id=mr.rid
+  </select>
+
+  <select id="menuTree" resultMap="allmenus">
+    select m1.id,m1.name,m2.id as id2,m2.name as name2,m3.id as id3,m3.name as name3 from menu m1 left join menu m2 on m1.id=m2.parentId
+left join menu m3 on m3.parentId=m2.id where m1.id=1
+
+  </select>
+</mapper>
